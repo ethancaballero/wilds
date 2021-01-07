@@ -38,6 +38,9 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_
     batch_idx = 0
     iterator = tqdm(dataset['loader']) if config.progress_bar else dataset['loader']
 
+    if dataset_val != None:
+        iterator_val = tqdm(dataset_val['loader']) if config.progress_bar else dataset_val['loader']
+
     for batch in iterator:
         if train:
             batch_results = algorithm.update(batch)
@@ -52,13 +55,20 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_
         epoch_y_pred.append(batch_results['y_pred'].clone().detach())
         epoch_metadata.append(batch_results['metadata'].clone().detach())
 
-        if train and (batch_idx+1) % config.log_every==0:
+        #if train and (batch_idx+1) % config.log_every==0:
+        if True:
             log_results(algorithm, dataset, general_logger, epoch, batch_idx)
             # mem = process.memory_info().rss
             # print(f'Mem: {mem / 1024 / 1024:6.1f}M')
 
             if dataset_val != None:
+                """
                 run_epoch(algorithm, dataset_val, general_logger, epoch, config, False)
+                """
+                for batch in iterator_val:
+                    batch_results = algorithm.evaluate(batch)
+                    val_loss = torch.nn.functional.cross_entropy(batch_results['y_pred'].detach(), batch_results['y_true'].detach())
+                    import pdb; pdb.set_trace()
 
         batch_idx += 1
 
