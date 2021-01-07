@@ -58,7 +58,7 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_
             # print(f'Mem: {mem / 1024 / 1024:6.1f}M')
 
             if dataset_val != None:
-                run_epoch(algorithm, datasets['val'], general_logger, epoch, config, False)
+                run_epoch(algorithm, dataset_val, general_logger, epoch, config, False)
 
         batch_idx += 1
 
