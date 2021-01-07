@@ -77,7 +77,7 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_
                 algorithm.train()
 
                 log_dict = {}
-                log_dict.update({'val_ce_loss': (val_loss/num_batches),
+                log_dict.update({'val_ce_loss': (val_loss.cpu().numpy().item()/num_batches),
                                 })    
                 wandb.log(log_dict, step=batch_idx*config.batch_size)
 
