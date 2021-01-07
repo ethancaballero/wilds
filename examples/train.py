@@ -57,8 +57,7 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_
         epoch_y_pred.append(batch_results['y_pred'].clone().detach())
         epoch_metadata.append(batch_results['metadata'].clone().detach())
 
-        #if train and (batch_idx+1) % config.log_every==0:
-        if True:
+        if train and (batch_idx+1) % config.log_every==0:
             log_results(algorithm, dataset, general_logger, epoch, batch_idx)
             # mem = process.memory_info().rss
             # print(f'Mem: {mem / 1024 / 1024:6.1f}M')
