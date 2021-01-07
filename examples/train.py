@@ -66,9 +66,11 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_
                 run_epoch(algorithm, dataset_val, general_logger, epoch, config, False)
                 """
                 for batch in iterator_val:
+                    algorithm.eval()
                     batch_results = algorithm.evaluate(batch)
                     val_loss = torch.nn.functional.cross_entropy(batch_results['y_pred'].detach(), batch_results['y_true'].detach())
                     import pdb; pdb.set_trace()
+                    algorithm.train()
 
         batch_idx += 1
 
