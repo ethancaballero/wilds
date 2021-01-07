@@ -2,3 +2,9 @@ __pycache__
 build
 dist
 wilds.egg-info
+
+data/
+env_wilds/
+logs/
+
+.DS_Store

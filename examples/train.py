@@ -14,7 +14,7 @@ def log_results(algorithm, dataset, general_logger, epoch, batch_idx):
             general_logger.write(algorithm.get_pretty_log_str())
         algorithm.reset_log()
 
-def run_epoch(algorithm, dataset, general_logger, epoch, config, train):
+def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_val=None):
     if dataset['verbose']:
         general_logger.write(f"\n{dataset['name']}:\n")
 
@@ -57,6 +57,9 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train):
             # mem = process.memory_info().rss
             # print(f'Mem: {mem / 1024 / 1024:6.1f}M')
 
+            if dataset_val != None:
+                run_epoch(algorithm, datasets['val'], general_logger, epoch, config, False)
+
         batch_idx += 1
 
     results, results_str = dataset['dataset'].eval(
@@ -87,10 +90,10 @@ def train(algorithm, datasets, general_logger, config, epoch_offset, best_val_me
         general_logger.write('\nEpoch [%d]:\n' % epoch)
 
         # First run training
-        run_epoch(algorithm, datasets['train'], general_logger, epoch, config, train=True)
+        run_epoch(algorithm, datasets['train'], general_logger, epoch, config, True, datasets['val'])
 
         # Then run val
-        val_results = run_epoch(algorithm, datasets['val'], general_logger, epoch, config, train=False)
+        val_results = run_epoch(algorithm, datasets['val'], general_logger, epoch, config, False)
         curr_val_metric = val_results[config.val_metric]
         general_logger.write(f'Validation {config.val_metric}: {curr_val_metric:.3f}\n')
 
