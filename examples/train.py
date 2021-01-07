@@ -4,6 +4,8 @@ import torch
 from utils import save
 import torch.autograd.profiler as profiler
 
+import wandb
+
 def log_results(algorithm, dataset, general_logger, epoch, batch_idx):
     if algorithm.has_log:
         log = algorithm.get_log()
@@ -41,7 +43,7 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_
     if dataset_val != None:
         iterator_val = tqdm(dataset_val['loader']) if config.progress_bar else dataset_val['loader']
 
-    for batch in iterator:
+    for bdx, batch in enumerate(iterator):
         if train:
             batch_results = algorithm.update(batch)
         else:
@@ -65,12 +67,19 @@ def run_epoch(algorithm, dataset, general_logger, epoch, config, train, dataset_
                 """
                 run_epoch(algorithm, dataset_val, general_logger, epoch, config, False)
                 """
-                for batch in iterator_val:
+                val_loss = 0
+                num_batches = 0
+                for vdx, batch in enumerate(iterator_val):
                     algorithm.eval()
                     batch_results = algorithm.evaluate(batch)
-                    val_loss = torch.nn.functional.cross_entropy(batch_results['y_pred'].detach(), batch_results['y_true'].detach())
-                    import pdb; pdb.set_trace()
-                    algorithm.train()
+                    val_loss += torch.nn.functional.cross_entropy(batch_results['y_pred'].detach(), batch_results['y_true'].detach())
+                    num_batches += 1
+                algorithm.train()
+
+                log_dict = {}
+                log_dict.update({'val_ce_loss': (val_loss/num_batches),
+                                })    
+                wandb.log(log_dict, step=batch_idx*config.batch_size)
 
         batch_idx += 1
 
